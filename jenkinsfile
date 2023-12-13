@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Pre-Build') {
+            steps {
+                // Taking clone of repo
+                sh 'git clone git@github.com:forza-dc/Wordpress-Dockerization.git'
+                // Downloading wordpress project
+                sh 'curl https://wordpress.org/latest.tar.gz | tar zx -C /Wordpress-Dockerization'
+                // Move wordpress to the docker directory
+                sh 'mv wordpress Wordpress-Dockerization/'
+                // Replace wp-config file of wordpress
+                sh '\cp -r wp-config/wp-config.php Wordpress-Dockerization/wordpress'
+                // Moving Bash Script to 
+                sh 'mv Wordpress-Dockerization/entrypoint/docker-entrypoint wordpress'
+            }
+        }
+        stage ('Build'){
+            steps {
+                // Building project
+                sh 'docker compose build'
+                // Running project
+                sh 'docker compose up -d'
+            }
+        }
+        stage('Testing'){
+            steps {
+                script {
+                    def response = httpRequest 'http://localhost:80'
+                    if (response.status == 200) {
+                        currentBuild.result = 'SUCCESS'
+                    } else {
+                        error 'Received a non-200 response code'
+                    }
+                }
+                // Removing containers and removing images
+                sh 'docker compose down'
+                sh 'docker system prune -f'
+
+            }
+        }
+    }
+    
+    post {
+        success {
+            sh 'echo "Project is running successfully."'
+        }
+    }
+}
