@@ -1,6 +1,6 @@
 # User Manual
 ## 1. To Run Project follow these steps
-- Copy Wordpress project inside Wordpress-Dockerization dirctory & name as wordpress
+- Copy & Replace wordpress project inside Wordpress-Dockerization dirctory & name it as wordpress
 - Copy Bash script from entrypoint folder and place it inside wordpress directory
 - Now to run project execute following command ***( docker-compose up -d )*** 
 ## 2. For first time setup in Database Host option set ip address of container insted of localhost to get ip follow first step for existing project follow both steps
